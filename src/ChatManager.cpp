@@ -1,7 +1,8 @@
 #include "ChatManager.h"
+
+#include <EclipseEngine/include/Object.h>
 #include "ChatMessage.h"
 #include "ChatWriter.h"
-#include "EclipseEngine/include/Object.h"
 
 namespace Eclipse
 {

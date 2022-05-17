@@ -3,6 +3,7 @@
 #ifdef NETWORKING_MODULE
 #include <EclipseNetworking/include/NetworkManager.h>
 #include <EclipseNetworking/include/NetworkIdentifiers.h>
+#include <EclipseNetworking/include/NetworkServer.h>
 
 #include <EclipseEngine/include/EclipseTime.h>
 
@@ -31,7 +32,6 @@ namespace Eclipse
 #ifdef NETWORKING_MODULE
 		void NetworkChatInterface::Receive(Networking::EclipsePacket& packet)
 		{
-
 			unsigned char id = packet.Read<unsigned char>();
 
 			std::string message = packet.Read<RakNet::RakString>();
@@ -42,16 +42,29 @@ namespace Eclipse
 			{
 				chatManager->Post(new NetworkChatMessage(message, senderIp, timeReceived));
 			}
+
+			Networking::NetworkServer* server = dynamic_cast<Networking::NetworkServer*>(Networking::NetworkManager::Instance);
+
+			if (server)
+			{
+				Networking::EclipsePacket newPacket((unsigned char)Networking::NetworkIdentifiers::EID_MESSAGE);
+
+				newPacket.Write(RakNet::RakString(message.c_str()));
+				newPacket.reliability = RELIABLE_ORDERED;
+				newPacket.priority = HIGH_PRIORITY;
+
+				server->SendPacketToAll(&newPacket, 0, false, 0, { packet.m_packet_->systemAddress });
+			}
 		}
 
 #endif
 		void NetworkChatInterface::ConnectInterface()
 		{
 #ifdef NETWORKING_MODULE
-			auto handle = Networking::NetworkManager::Instance->handler.GetReceivedHandle((unsigned int)Networking::NetworkIdentifiers::EID_MESSAGE);
+			auto handle = Networking::NetworkManager::Instance->handler.OnPacketReceived[(unsigned int)Networking::NetworkIdentifiers::EID_MESSAGE];
 			if (!handle)
 			{
-				Networking::NetworkManager::Instance->handler.OnPacketReceived.emplace((unsigned int)Networking::NetworkIdentifiers::EID_MESSAGE, new Engine::EclipseEvent<Networking::EclipsePacket&>);
+				Networking::NetworkManager::Instance->handler.OnPacketReceived.AddEvent((unsigned int)Networking::NetworkIdentifiers::EID_MESSAGE, new Engine::EclipseEvent<Networking::EclipsePacket&>);
 			}
 
 			handle->AddListener([this](Networking::EclipsePacket& packet) {this->Receive(packet); });
