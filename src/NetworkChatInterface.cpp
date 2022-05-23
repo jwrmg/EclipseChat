@@ -32,7 +32,7 @@ namespace Eclipse
 #ifdef NETWORKING_MODULE
 		void NetworkChatInterface::Receive(Networking::EclipsePacket& packet)
 		{
-			unsigned char id = packet.Read<unsigned char>();
+			//unsigned char id = packet.Read<unsigned char>();
 
 			std::string message = packet.Read<RakNet::RakString>();
 
