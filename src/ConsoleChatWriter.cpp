@@ -5,14 +5,12 @@
 
 namespace Eclipse
 {
-	namespace Chat
-	{
-		void ConsoleChatWriter::WriteMessage(ChatMessage* message)
-		{
-			std::stringstream ss;
-			ss << message->ToString();
-			Engine::Console::WriteLine(ss);
-			Engine::Console::ConsoleBeep(500, 100);
-		}
-	}
+    namespace Chat
+    {
+        void ConsoleChatWriter::WriteMessage(ChatMessage* message)
+        {
+            Engine::Console::WriteLine(message->ToString());
+            Engine::Console::ConsoleBeep(500, 100);
+        }
+    }
 }
