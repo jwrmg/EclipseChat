@@ -3,7 +3,7 @@
 #include "ChatInterface.h"
 
 #ifdef NETWORKING_MODULE
-#include <EclipseNetworking/include/EclipsePacket.h>
+#include <EclipseNetworking/include/NetworkPacket.h>
 #endif
 
 
@@ -16,7 +16,7 @@ namespace Eclipse
 		public:
 			void Send(const std::string& message) override;
 #ifdef NETWORKING_MODULE
-			void Receive(Networking::EclipsePacket& packet);
+			void Receive(Networking::NetworkPacket& packet);
 #endif
 		protected:
 			void ConnectInterface() override;

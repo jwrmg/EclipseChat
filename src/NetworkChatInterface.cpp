@@ -16,7 +16,7 @@ namespace Eclipse
 		void NetworkChatInterface::Send(const std::string& message)
 		{
 #ifdef NETWORKING_MODULE
-			Networking::EclipsePacket packet(static_cast<unsigned char>(Networking::NetworkIdentifiers::EID_MESSAGE));
+			Networking::NetworkPacket packet(static_cast<unsigned char>(Networking::NetworkIdentifiers::EID_MESSAGE));
 
 			packet.Write(RakNet::RakString(message.c_str()));
 
@@ -30,7 +30,7 @@ namespace Eclipse
 		}
 		// oh lmao
 #ifdef NETWORKING_MODULE
-		void NetworkChatInterface::Receive(Networking::EclipsePacket& packet)
+		void NetworkChatInterface::Receive(Networking::NetworkPacket& packet)
 		{
 			//unsigned char id = packet.Read<unsigned char>();
 
@@ -47,7 +47,7 @@ namespace Eclipse
 
 			if (server)
 			{
-				Networking::EclipsePacket newPacket((unsigned char)Networking::NetworkIdentifiers::EID_MESSAGE);
+				Networking::NetworkPacket newPacket((unsigned char)Networking::NetworkIdentifiers::EID_MESSAGE);
 
 				newPacket.Write(RakNet::RakString(message.c_str()));
 				newPacket.reliability = RELIABLE_ORDERED;
@@ -64,10 +64,10 @@ namespace Eclipse
 			auto handle = Networking::NetworkManager::Instance->handler.OnPacketReceived[(unsigned int)Networking::NetworkIdentifiers::EID_MESSAGE];
 			if (!handle)
 			{
-				Networking::NetworkManager::Instance->handler.OnPacketReceived.AddEvent((unsigned int)Networking::NetworkIdentifiers::EID_MESSAGE, new Engine::EclipseEvent<Networking::EclipsePacket&>);
+				Networking::NetworkManager::Instance->handler.OnPacketReceived.AddEvent((unsigned int)Networking::NetworkIdentifiers::EID_MESSAGE, new Engine::EclipseEvent<Networking::NetworkPacket&>);
 			}
 
-			handle->AddListener([this](Networking::EclipsePacket& packet) {this->Receive(packet); });
+			handle->AddListener([this](Networking::NetworkPacket& packet) {this->Receive(packet); });
 #else
 			External::Debug::DebugAPI::Debug("Networking is not installed.");
 #endif
